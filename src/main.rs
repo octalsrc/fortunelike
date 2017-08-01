@@ -56,7 +56,6 @@ fn decide_db_path() -> PathBuf {
         }
     }
 
-    println!("{:?}",path);
     path
 }
 
