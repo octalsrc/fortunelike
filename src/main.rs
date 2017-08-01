@@ -9,13 +9,11 @@ use std::path::PathBuf;
 use std::io::{Error, ErrorKind};
 use std::io::prelude::*;
 
-const CONFIG: &str = "shellprompts";
+const DB_DEFAULT: &str = "fortunelike-db";
+const DB_VAR: &str = "FORTUNELIKE_DB";
 
 fn main() {
-    let config_file: PathBuf = match std::env::var("HOME") {
-        Ok(home) => [&home, ".config", CONFIG].iter().collect(),
-        Err(_) => ["etc", CONFIG].iter().collect()
-    };
+    let config_file = decide_db_path();
     match load_config(config_file) {
         Ok(prompts) => {
             let mut rng = rand::thread_rng();
@@ -24,6 +22,42 @@ fn main() {
         }
         Err(_) => println!("{}","[?]")
     }
+}
+
+fn decide_db_path() -> PathBuf {
+    let mut path = ["etc", DB_DEFAULT].iter().collect();
+    match std::env::var("HOME") {
+        Ok(home) => path = [&home, ".config", DB_DEFAULT].iter().collect(),
+        Err(_) => ()
+    }
+    match std::env::var(DB_VAR) {
+        Ok(custom) => {
+            path = PathBuf::new();
+            path.push(custom)
+        },
+        Err(_) => ()
+    }
+    
+    let mut path_flag = false;
+    for a in std::env::args() {
+        match path_flag {
+            true => {
+                path_flag = false;
+                path = PathBuf::new();
+                path.push(a)
+            },
+            false => {
+                match Some(&*a) {
+                    Some("-f") => path_flag = true,
+                    Some("--dbfile") => path_flag = true,
+                    _ => ()
+                }
+            }
+        }
+    }
+
+    println!("{:?}",path);
+    path
 }
 
 fn load_config(path: PathBuf) -> std::io::Result<Vec<String>> {
