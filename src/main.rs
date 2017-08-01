@@ -1,4 +1,3 @@
-
 extern crate yaml_rust;
 use yaml_rust::{Yaml, YamlLoader};
 
@@ -6,21 +5,28 @@ extern crate rand;
 use rand::distributions::{IndependentSample, Range};
 
 use std::fs::File;
+use std::path::PathBuf;
 use std::io::{Error, ErrorKind};
 use std::io::prelude::*;
 
+const CONFIG: &str = "shellprompts";
+
 fn main() {
-    match load_config("test.yaml") {
+    let config_file: PathBuf = match std::env::var("HOME") {
+        Ok(home) => [&home, ".config", CONFIG].iter().collect(),
+        Err(_) => ["etc", CONFIG].iter().collect()
+    };
+    match load_config(config_file) {
         Ok(prompts) => {
             let mut rng = rand::thread_rng();
             let key = Range::new(0,prompts.len()).ind_sample(&mut rng);
             println!("{}",prompts[key]);
         }
-        Err(e) => println!("{}",e)
+        Err(_) => println!("{}","[?]")
     }
 }
 
-fn load_config(path: &str) -> std::io::Result<Vec<String>> {
+fn load_config(path: PathBuf) -> std::io::Result<Vec<String>> {
     let mut config_file = File::open(path)?;
     let mut config_contents = String::new();
     config_file.read_to_string(&mut config_contents)?;
