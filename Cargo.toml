@@ -2,6 +2,31 @@
 name = "fortunelike"
 version = "0.2.0"
 authors = ["octalsrc <octal@octalsrc.org>"]
+description = "Classic cli utility that prints random messages"
+license = "GPL-3.0+"
+repository = "https://github.com/octalsrc/fortunelike"
+readme = "README.md"
+
+keywords = [
+  "cli",
+  "terminal",
+  "game",
+]
+
+categories = [
+  "command-line-utilities",
+  "games",
+]
+
+include = [
+  "Cargo.toml",
+  "Cargo.lock",
+  "README.md",
+  "COPYING",
+  "example_db.yaml",
+  "words_db.yaml",
+  "src/**/*",
+]
 
 [dependencies]
 yaml-rust = "0.3"
